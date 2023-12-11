@@ -1,31 +1,30 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const app = express();
-const bodyParser = require('body-parser');
 
 app.use(cookieParser());
 
-const username = 'stacy';
+const validUsernames = ['stacy']; // In a real app, this would be replaced by a user database
 
 app.get("/start", (req, res) => {
   const uid = req.query.id;
-  if(uid === username) {
-    console.log(uid);
-    res.cookie('user', 'stacy', { httpOnly: false});
+  // Basic validation for user ID
+  if (validUsernames.includes(uid)) {
+    // Set cookie with HttpOnly and Secure flags
+    res.cookie('user', uid, { httpOnly: true, secure: true });
+    res.send("Start Page");
+  } else {
+    res.send("Invalid User");
   }
-  res.send("Start Page");
 });
 
 app.get("/home", (req, res) => {
-  console.log(req.cookies);
   let uname = req.cookies['user'];
-  if(uname === username) {
-    res.send("You have logged in! Welcome : " + username);
-  }
-  else{
+  if (validUsernames.includes(uname)) {
+    res.send("You have logged in! Welcome: " + uname);
+  } else {
     res.send("You are not authorized to view this page");
   }
-
-})
+});
 
 app.listen(8000);
